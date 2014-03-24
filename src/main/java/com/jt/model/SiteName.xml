@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.jt.model.SiteName">
+
+	<resultMap id="siteNameResultMap" type="SiteName" autoMapping="true">
+		<id property="id" column="ID" />
+		<result property="siteName" column="SITE_NAME" />
+		<result property="siteUrl" column="SITE_URL" />
+		<result property="siteAddress" column="SITE_ADDRESS" />
+		<result property="createDate" column="CREATE_DATE" />
+		<result property="updateDate" column="UPDATE_DATE" />
+	</resultMap>
+	
+	<insert id="add" parameterType="SiteName">
+		insert into t_sitename (SITE_NAME, SITE_URL, SITE_ADDRESS, CREATE_DATE) 
+		values (#{siteName}, #{siteUrl}, #{siteAddress}, #{createDate});
+	</insert>
+	
+	<select id="load" parameterType="string" resultMap="siteNameResultMap">
+		select * from t_sitename t1 where t.id=#{id}
+	</select>
+	
+	<select id="loadByName" parameterType="string" resultMap="siteNameResultMap">
+		select * from t_sitename t1 where t1.site_name like '%'||#{param1}||'%'
+	</select>
+
+	<select id="find" parameterType="map" resultMap="siteNameResultMap">
+		select *
+		 from (select rid from 
+				             (select rownum rn, rid
+						       from (select rowid rid from
+								          (select t.id from t_sitename t order by t.id)
+									  )
+							   )
+                <where>
+                    <![CDATA[rn <= #{pageOffset}+#{pageSize}]]> and <![CDATA[rn >= #{pageOffset}]]> 
+		         </where>) t1, t_sitename t2
+		 where t2.rowid = t1.rid 
+	</select>
+	
+	<select id="find_count" parameterType="map" resultType="int">
+		select count(t.id) from t_sitename  t
+	</select>
+	
+</mapper>
